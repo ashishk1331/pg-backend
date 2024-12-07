@@ -12,7 +12,7 @@ func GenerateBase(code *CodeSample) string {
 %s
 
 def main():
-	print(add(10, 20))
+	print(add(10, 45))
 
 if __name__ == "__main__":
 	main()
