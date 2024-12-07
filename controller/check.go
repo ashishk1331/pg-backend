@@ -8,7 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"os/exec"
-	"fmt"
+	"log"
 	"time"
 )
 
@@ -35,7 +35,8 @@ func runCode(wg *sync.WaitGroup, code *CodeSample) {
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		fmt.Printf("Error executing: %v\n", err)
+		log.Printf("Error executing: %v\n", err)
+		code.Error = string(output)
 		code.OK = false
 		return
 	}

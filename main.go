@@ -2,12 +2,14 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"pg-backend/controller"
+	"pg-backend/routes"
 )
 
 func main() {
-	r := gin.Default()
+	router := gin.Default()
 
-	r.POST("/check", check.Get)
-	r.Run(":8000")
+	v1 := router.Group("/api/v1")
+	routes.RegisterV1Group(v1)
+
+	router.Run(":8000")
 }
