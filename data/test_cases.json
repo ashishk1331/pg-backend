@@ -1,0 +1,9 @@
+{
+	"brightness": [[45], [100]],
+	"contrast": [[12], [-45]],
+	"histogram": [],
+	"histogram_equalization": [],
+	"histogram_specification": [],
+	"flip_vertical": [],
+	"rotate_90": []
+}

@@ -1,0 +1,55 @@
+{
+	"histogram_techniques": {
+		"brightness": {
+			"fn_name": "change_brightness",
+			"signature": ["image", "brightness"],
+			"input": ["IMG", "Z"],
+			"output": ["IMG"],
+			"id": "db45796f-b1f5-4ea3-b8aa-8215274f72da"
+		},
+		"contrast": {
+			"fn_name": "change_contrast",
+			"signature": ["image", "contrast"],
+			"input": ["IMG", "Z"],
+			"output": ["IMG"],
+			"id": "d5da605a-0a79-474b-bd29-682e41f6f2c6"
+		},
+		"histogram": {
+			"fn_name": "generate_histogram",
+			"signature": ["image"],
+			"input": ["IMG"],
+			"output": ["D"],
+			"id": "ecac035a-97be-46d0-b3bf-acf91d287552"
+		},
+		"histogram_equalization": {
+			"fn_name": "equalize_histogram",
+			"signature": ["image"],
+			"input": ["IMG"],
+			"output": ["IMG"],
+			"id": "328f4ba1-6855-441b-9c0f-f0d2054c8c71"
+		},
+		"histogram_specification": {
+			"fn_name": "create_histogram_specification",
+			"signature": ["image"],
+			"input": ["IMG"],
+			"output": ["IMG"],
+			"id": "51fd0559-9ccf-4346-89c5-d35c3df726f9"
+		}
+	},
+	"graphics_algorithms": {
+		"flip_vertical": {
+			"fn_name": "flip_image_vertical",
+			"signature": ["image"],
+			"input": ["IMG"],
+			"output": ["IMG"],
+			"id": "2ce3dc21-febc-4af5-9741-4b4bf8f8de84"
+		},
+		"rotate_90": {
+			"fn_name": "rotate_image",
+			"signature": ["image"],
+			"input": ["IMG"],
+			"output": ["IMG"],
+			"id": "53fbad7d-321b-472d-80f7-c518e0bb7ab1"
+		}
+	}
+}
