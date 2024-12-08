@@ -8,8 +8,7 @@ import (
 func main() {
 	router := gin.Default()
 
-	v1 := router.Group("/api/v1")
-	routes.RegisterV1Group(v1)
+	routes.RegisterV1Group(router)
 
 	router.Run(":8000")
 }

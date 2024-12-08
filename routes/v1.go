@@ -6,7 +6,10 @@ import (
 	"pg-backend/controller/run"
 )
 
-func RegisterV1Group(router *gin.RouterGroup) {
-	router.POST("/check", check.Post)
-	router.POST("/run", run.Post)
+func RegisterV1Group(router *gin.Engine) {
+	v1 := router.Group("/api/v1")
+	{
+		v1.POST("/check", check.Post)
+		v1.POST("/run", run.Post)
+	}
 }
