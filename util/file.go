@@ -5,8 +5,8 @@ import (
 	"os"
 )
 
-func WriteFile(content string) {
-	file, err := os.OpenFile("script.py", os.O_CREATE|os.O_WRONLY, 0644)
+func WriteFile(filepath, content string) {
+	file, err := os.OpenFile(filepath, os.O_CREATE|os.O_WRONLY, 0644)
 
 	if err != nil {
 		panic(err)

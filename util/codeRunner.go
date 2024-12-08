@@ -13,13 +13,14 @@ func RunCode(wg *sync.WaitGroup, code *CodeSample, content string) {
 	defer wg.Done()
 
 	wd, _ := os.Getwd()
-	var filename string = filepath.Join(wd, "script.py")
+	var filename string = "py-"+ UUID() + ".py"
+	var filepath string = filepath.Join(wd, filename)
 
-	WriteFile(content)
-	defer DeleteFile(filename)
+	WriteFile(filepath, content)
+	defer DeleteFile(filepath)
 
 	start := time.Now()
-	cmd := exec.Command("python", filename)
+	cmd := exec.Command("python", filepath)
 	elapsed := time.Since(start)
 
 	code.TimeTaken = int(elapsed)
