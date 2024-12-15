@@ -1,0 +1,11 @@
+from typing import List
+
+type IMG = List[List[int]]
+type D = List[int]
+type Z = int
+
+def {{ .FnName }}({{ template "parameters" . }}) -> {{ template "returnTypes" .Output }}:
+	pass
+
+{{ define "parameters" }}{{ range $index, $args := .Signature }}{{ if $index }}, {{ end }}{{ $args }}: {{ index $.Input $index }}{{end}}{{ end }}
+{{ define "returnTypes" }}{{ range $index, $args := . }}{{ if $index }}, {{ end }}{{ $args }}{{end}}{{ end }}
