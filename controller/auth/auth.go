@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"fmt"
 	"net/http"
 	"pg-backend/config"
 	"pg-backend/models"
@@ -11,20 +12,42 @@ import (
 )
 
 func Login(c *gin.Context) {
-	var loginBody models.User
-	if err := c.ShouldBind(&loginBody); err != nil {
+	var input models.User
+	if err := c.ShouldBind(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	if loginBody.Email == "" {
+	if input.Email == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Email is Required"})
 		return
 	}
-	if loginBody.Password == "" {
+	if !util.ValidateEmail(input.Email) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Email is Invalid"})
+		return
+	}
+	if input.Password == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Password is Required"})
 		return
 	}
-	c.JSON(http.StatusOK, "Login")
+	var user models.User
+	if err := config.DB.Where("email = ?", input.Email).First(&user).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+	if err := util.ComparePassword(user.Password, input.Password); err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid Credentials"})
+		return
+	}
+
+	user.Password = ""
+	fmt.Printf("user: %v\n", user)
+	token, err := util.GenerateJWTToken(user)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.Header("Authorization", token)
+	c.JSON(http.StatusOK, "Logged In Successfully")
 }
 
 func Register(c *gin.Context) {
