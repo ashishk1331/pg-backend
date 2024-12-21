@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"fmt"
 	"net/http"
 	"pg-backend/config"
 	"pg-backend/models"
@@ -40,14 +39,13 @@ func Login(c *gin.Context) {
 	}
 
 	user.Password = ""
-	fmt.Printf("user: %v\n", user)
 	token, err := util.GenerateJWTToken(user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	c.Header("Authorization", token)
-	c.JSON(http.StatusOK, "Logged In Successfully")
+	c.JSON(http.StatusOK, gin.H{"message": "Logged In Successfully", "token": token})
 }
 
 func Register(c *gin.Context) {
