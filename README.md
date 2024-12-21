@@ -87,7 +87,7 @@ All routes are prefixed with `/api/v1` for the version one API routes.
 
    ```json
    {
-      "error"?:"Incase of error",
+      "error": "Incase of error",
       "message"?:"In case of success",
       "token"?:"In case of success"
    }

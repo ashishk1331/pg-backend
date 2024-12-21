@@ -9,7 +9,7 @@ import (
 )
 
 type UserClaims struct {
-	ID    int    `json:"id"`
+	Id    int    `json:"id"`
 	Email string `json:"email"`
 	Role  string `json:"role"`
 	jwt.RegisteredClaims
@@ -20,7 +20,7 @@ var jwtSecret = []byte(os.Getenv("JWT_SECRET"))
 func GenerateJWTToken(user models.User) (string, error) {
 	expirationTime := time.Now().Add(24 * time.Hour)
 	claims := &UserClaims{
-		ID:    user.Id,
+		Id:    user.Id,
 		Email: user.Email,
 		Role:  user.Role,
 		RegisteredClaims: jwt.RegisteredClaims{
@@ -34,4 +34,18 @@ func GenerateJWTToken(user models.User) (string, error) {
 		return "", err
 	}
 	return signedToken, nil
+}
+
+func ParseJWTToken(tokenString string) (*UserClaims, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &UserClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return jwtSecret, nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	claims, ok := token.Claims.(*UserClaims)
+	if !ok {
+		return nil, err
+	}
+	return claims, nil
 }
