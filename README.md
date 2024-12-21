@@ -21,7 +21,7 @@ All routes are prefixed with `/api/v1` for the version one API routes.
 
    ```json
    {
-      "content": "a, b = 23, 34\nprint(a + b)"
+     "content": "a, b = 23, 34\nprint(a + b)"
    }
    ```
 
@@ -32,7 +32,7 @@ All routes are prefixed with `/api/v1` for the version one API routes.
 
    ```json
    {
-      "content": "def add(a, b):\n    return a + b\nprint(add(2, 5))"
+     "content": "def add(a, b):\n    return a + b\nprint(add(2, 5))"
    }
    ```
 
@@ -40,11 +40,11 @@ All routes are prefixed with `/api/v1` for the version one API routes.
 
    ```json
    {
-      "error": "",
-      "ok": true,
-      "output": "7\r\n",
-      "time_taken": 8993200,
-      "time_units": "ns"
+     "error": "",
+     "ok": true,
+     "output": "7\r\n",
+     "time_taken": 8993200,
+     "time_units": "ns"
    }
    ```
 
@@ -69,4 +69,50 @@ All routes are prefixed with `/api/v1` for the version one API routes.
 
    def change_contrast(image: IMG, contrast: Z) -> IMG:
      pass
+   ```
+
+4. **POST** `/login`
+   It takes email and password of the user and returns generated token upon success.
+
+   sample body,
+
+   ```json
+   {
+     "email": "anuragsrivastav0027@gmail.com",
+     "password": "123456"
+   }
+   ```
+
+   response,
+
+   ```json
+   {
+      "error"?:"Incase of error",
+      "message"?:"In case of success",
+      "token"?:"In case of success"
+   }
+   ```
+
+5. **POST** `/register`
+   It takes email and password of the user creates and returns new user upon success.
+
+   sample body,
+
+   ```json
+   {
+     "email": "anuragsrivastav0027@gmail.com",
+     "password": "123456"
+   }
+   ```
+
+   response,
+
+   ```json
+   {
+      "error"?:"Incase of error",
+      "id"?:"User Id",
+      "email"?:"User's email"
+      "fullName"?:"",
+      "userName"?:""
+   }
    ```
