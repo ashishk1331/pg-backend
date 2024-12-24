@@ -35,5 +35,6 @@ func Get(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"message": "User found",
 		"user":    userInfo,
+		"email":   x.Email,
 	})
 }

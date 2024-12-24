@@ -19,9 +19,9 @@ func GetUserByEmail(email string) (*models.User, error) {
 	}
 	return &user, nil
 }
-func GetUserById(userId string) (*models.User, error) {
+func GetUserById(id int) (*models.User, error) {
 	var user models.User
-	if err := config.DB.Where("user_id = ?", userId).First(&user).Error; err != nil {
+	if err := config.DB.Where("id = ?", id).First(&user).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, errors.New("user not found")
 		}

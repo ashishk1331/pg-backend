@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"fmt"
 	"net/http"
 	"pg-backend/config"
 	"pg-backend/models"
@@ -124,14 +125,57 @@ func ForgotPassword(c *gin.Context) {
 	// iF email exits send password reset email
 	// Generate JWT token with user email for 15 minutes
 	token, err := util.GenerateJWTToken(user, time.Minute*15)
+	resetLink := fmt.Sprintf("http://localhost:3000/auth/reset-password?token=%s", token)
+	fmt.Println(token)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	if err := util.SendPasswordResetEmail(user, token); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error(), "resetLink": resetLink})
 		return
 	}
 	c.Header("Authorization", token)
-	c.JSON(http.StatusOK, gin.H{"message": "Password reset mail sent successfully", "token": token})
+	c.JSON(http.StatusOK, gin.H{"message": "Password reset mail sent successfully", "resetLink": resetLink})
+}
+
+func ResetPassword(c *gin.Context) {
+	var input struct {
+		Password string `json:"password"`
+	}
+	if err := c.ShouldBind(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if input.Password == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Password is Required"})
+		return
+	}
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	userData, ok := user.(*models.User)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	existingUser, err := repository.GetUserById(userData.Id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+	hashedPassword, err := util.Encrypt(input.Password)
+	if err != nil {
+		fmt.Print("Error")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	existingUser.Password = hashedPassword
+	if err := config.DB.Save(&existingUser).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Password reset successfully"})
 }
