@@ -17,14 +17,14 @@ type UserClaims struct {
 
 var jwtSecret = []byte(os.Getenv("JWT_SECRET"))
 
-func GenerateJWTToken(user models.User) (string, error) {
-	expirationTime := time.Now().Add(24 * time.Hour)
+func GenerateJWTToken(user *models.User, expiresIn time.Duration) (string, error) {
+	user.Password = ""
 	claims := &UserClaims{
 		Id:    user.Id,
 		Email: user.Email,
 		Role:  user.Role,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(expirationTime),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(expiresIn)),
 			Issuer:    "Playground",
 		},
 	}

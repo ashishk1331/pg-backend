@@ -4,8 +4,10 @@ import (
 	"net/http"
 	"pg-backend/config"
 	"pg-backend/models"
+	"pg-backend/repository"
 	"pg-backend/util"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -28,8 +30,8 @@ func Login(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Password is Required"})
 		return
 	}
-	var user models.User
-	if err := config.DB.Where("email = ?", input.Email).First(&user).Error; err != nil {
+	user, err := repository.GetUserByEmail(input.Email)
+	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
@@ -37,9 +39,8 @@ func Login(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid Credentials"})
 		return
 	}
-
 	user.Password = ""
-	token, err := util.GenerateJWTToken(user)
+	token, err := util.GenerateJWTToken(user, time.Hour*24)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -67,8 +68,8 @@ func Register(c *gin.Context) {
 		return
 	}
 	// Check if the email already exists in the database
-	var existingUser models.User
-	if err := config.DB.Where("email = ?", input.Email).First(&existingUser).Error; err == nil {
+	_, err := repository.GetUserByEmail(input.Email)
+	if err == nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "User with this email already exists"})
 		return
 	}
@@ -79,7 +80,6 @@ func Register(c *gin.Context) {
 	}
 	input.Password = hashedPassword
 	if err := config.DB.Create(&input).Error; err != nil {
-
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -97,4 +97,41 @@ func Register(c *gin.Context) {
 		"fullName": userInfo.Fullname,
 		"imageUrl": userInfo.ImageUrl,
 		"email":    input.Email})
+}
+
+func ForgotPassword(c *gin.Context) {
+	var input struct {
+		Email string `json:"email"`
+	}
+	if err := c.ShouldBind(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if input.Email == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Email is Required"})
+		return
+	}
+	if !util.ValidateEmail(input.Email) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Email is Invalid"})
+		return
+	}
+	// check if user with email exits
+	user, err := repository.GetUserByEmail(input.Email)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+	// iF email exits send password reset email
+	// Generate JWT token with user email for 15 minutes
+	token, err := util.GenerateJWTToken(user, time.Minute*15)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	if err := util.SendPasswordResetEmail(user, token); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.Header("Authorization", token)
+	c.JSON(http.StatusOK, gin.H{"message": "Password reset mail sent successfully", "token": token})
 }

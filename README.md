@@ -71,7 +71,7 @@ All routes are prefixed with `/api/v1` for the version one API routes.
      pass
    ```
 
-4. **POST** `/login`
+4. **POST** `/auth/login`
    It takes email and password of the user and returns generated token upon success.
 
    sample body,
@@ -93,7 +93,7 @@ All routes are prefixed with `/api/v1` for the version one API routes.
    }
    ```
 
-5. **POST** `/register`
+5. **POST** `/auth/register`
    It takes email and password of the user creates and returns new user upon success.
 
    sample body,
