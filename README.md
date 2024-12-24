@@ -87,9 +87,9 @@ All routes are prefixed with `/api/v1` for the version one API routes.
 
    ```json
    {
-      "error": "Incase of error",
-      "message"?:"In case of success",
-      "token"?:"In case of success"
+     "error": "Incase of error",
+     "message": "In case of success",
+     "token": "In case of success"
    }
    ```
 
@@ -109,10 +109,58 @@ All routes are prefixed with `/api/v1` for the version one API routes.
 
    ```json
    {
-      "error"?:"Incase of error",
-      "id"?:"User Id",
-      "email"?:"User's email"
-      "fullName"?:"",
-      "userName"?:""
+     "error": "Incase of error",
+     "id": "User Id",
+     "email": "User's email",
+     "fullName": "",
+     "userName": ""
    }
    ```
+
+6. **POST** `/auth/forgot-password`
+   It takes email and sends a reset Link on email
+
+   sample body,
+
+   ```json
+   {
+     "email": "anuragsrivastav0027@gmail.com"
+   }
+   ```
+
+   response,
+
+   ```json
+   {
+     "error": "Incase of error",
+     "message": "In case of success"
+   }
+   ```
+
+7. **POST** `/auth/reset-password`
+   It accepts token from reset link as bearer token in header and expects new password and resets password of user
+
+sample Header,
+
+```json
+{
+  "Authorization": Bearer token
+}
+```
+
+sample body,
+
+```json
+{
+  "password": "123456"
+}
+```
+
+response,
+
+```json
+{
+  "error": "Incase of error",
+  "message": "In case of success"
+}
+```
