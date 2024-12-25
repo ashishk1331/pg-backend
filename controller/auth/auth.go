@@ -166,7 +166,6 @@ func ResetPassword(c *gin.Context) {
 	}
 	hashedPassword, err := util.Encrypt(input.Password)
 	if err != nil {
-		fmt.Print("Error")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
