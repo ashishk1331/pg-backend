@@ -12,6 +12,7 @@ import (
 
 func main() {
 	godotenv.Load(".env")
+	config.InitJWTSecret()
 	config.ConnectSQLDB()
 	models.MigrateUser(config.DB)
 	models.MigrateUserInfo(config.DB)

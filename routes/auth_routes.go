@@ -13,6 +13,7 @@ func RegisterAuthRoutes(router *gin.RouterGroup) {
 		authRouter.POST("/login", auth.Login)
 		authRouter.POST("/register", auth.Register)
 		authRouter.POST("/forgot-password", auth.ForgotPassword)
-		authRouter.POST("/reset-password", middleware.VerifyTokenMiddleware(), auth.ResetPassword)
+		authRouter.POST("/reset-password", middleware.VerifyResetTokenMiddleware(), auth.ResetPassword)
+		authRouter.GET("/get-user", middleware.VerifyResetTokenMiddleware(), auth.GetUser)
 	}
 }

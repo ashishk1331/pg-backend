@@ -3,7 +3,6 @@ package auth
 import (
 	"fmt"
 	"net/http"
-	"os"
 	"pg-backend/config"
 	"pg-backend/models"
 	"pg-backend/repository"
@@ -13,9 +12,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 )
-
-var jwtSecret = []byte(os.Getenv("JWT_SECRET"))
-var resetSecret = []byte(os.Getenv("RESET_SECRET"))
 
 func Login(c *gin.Context) {
 	var input models.User
@@ -45,7 +41,7 @@ func Login(c *gin.Context) {
 		return
 	}
 	user.Password = ""
-	token, err := util.GenerateJWTToken(user, time.Hour*24, jwtSecret)
+	token, err := util.GenerateJWTToken(user, time.Hour*24, config.JwtSecret)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -128,7 +124,7 @@ func ForgotPassword(c *gin.Context) {
 	}
 	// iF email exits send password reset email
 	// Generate JWT token with user email for 15 minutes
-	token, err := util.GenerateJWTToken(user, time.Minute*15, resetSecret)
+	token, err := util.GenerateJWTToken(user, time.Minute*15, config.ResetSecret)
 	resetLink := fmt.Sprintf("http://localhost:3000/reset-password?token=%s", token)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
@@ -180,4 +176,24 @@ func ResetPassword(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Password reset successfully"})
+}
+
+func GetUser(c *gin.Context) {
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	userData, ok := user.(*models.User)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	existingUser, err := repository.GetUserById(userData.Id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+	existingUser.Password = ""
+	c.JSON(http.StatusOK, gin.H{"message": "User found", "user": existingUser})
 }

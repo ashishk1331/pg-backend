@@ -1,7 +1,9 @@
 package user
 
 import (
+	"fmt"
 	"net/http"
+	"os"
 	"pg-backend/config"
 	"pg-backend/models"
 	"pg-backend/repository"
@@ -19,7 +21,8 @@ func Get(c *gin.Context) {
 		})
 		return
 	}
-	x, err := util.ParseJWTToken(token)
+	fmt.Println(config.JwtSecret, os.Getenv("JWT_SECRET"))
+	x, err := util.ParseJWTToken(token, config.JwtSecret)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"error": "Invalid token",
