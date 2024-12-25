@@ -2,6 +2,7 @@ package main
 
 import (
 	"pg-backend/config"
+	middleware "pg-backend/middelware"
 	"pg-backend/models"
 	"pg-backend/routes"
 
@@ -15,6 +16,7 @@ func main() {
 	models.MigrateUser(config.DB)
 	models.MigrateUserInfo(config.DB)
 	router := gin.Default()
+	router.Use(middleware.CORSMiddleware())
 	routes.RegisterV1Group(router)
 	router.Run(":8000")
 }
