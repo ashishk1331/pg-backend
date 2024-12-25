@@ -1,7 +1,6 @@
 package util
 
 import (
-	"os"
 	"pg-backend/models"
 	"time"
 
@@ -15,9 +14,7 @@ type UserClaims struct {
 	jwt.RegisteredClaims
 }
 
-var jwtSecret = []byte(os.Getenv("JWT_SECRET"))
-
-func GenerateJWTToken(user *models.User, expiresIn time.Duration) (string, error) {
+func GenerateJWTToken(user *models.User, expiresIn time.Duration, secret []byte) (string, error) {
 	user.Password = ""
 	claims := &UserClaims{
 		Id:    user.Id,
@@ -29,16 +26,16 @@ func GenerateJWTToken(user *models.User, expiresIn time.Duration) (string, error
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	signedToken, err := token.SignedString(jwtSecret)
+	signedToken, err := token.SignedString(secret)
 	if err != nil {
 		return "", err
 	}
 	return signedToken, nil
 }
 
-func ParseJWTToken(tokenString string) (*UserClaims, error) {
+func ParseJWTToken(tokenString string, secret []byte) (*UserClaims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &UserClaims{}, func(token *jwt.Token) (interface{}, error) {
-		return jwtSecret, nil
+		return secret, nil
 	})
 	if err != nil {
 		return nil, err

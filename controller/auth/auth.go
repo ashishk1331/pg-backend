@@ -3,6 +3,7 @@ package auth
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"pg-backend/config"
 	"pg-backend/models"
 	"pg-backend/repository"
@@ -12,6 +13,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 )
+
+var jwtSecret = []byte(os.Getenv("JWT_SECRET"))
+var resetSecret = []byte(os.Getenv("RESET_SECRET"))
 
 func Login(c *gin.Context) {
 	var input models.User
@@ -41,7 +45,7 @@ func Login(c *gin.Context) {
 		return
 	}
 	user.Password = ""
-	token, err := util.GenerateJWTToken(user, time.Hour*24)
+	token, err := util.GenerateJWTToken(user, time.Hour*24, jwtSecret)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -124,18 +128,16 @@ func ForgotPassword(c *gin.Context) {
 	}
 	// iF email exits send password reset email
 	// Generate JWT token with user email for 15 minutes
-	token, err := util.GenerateJWTToken(user, time.Minute*15)
-	resetLink := fmt.Sprintf("http://localhost:3000/auth/reset-password?token=%s", token)
-	fmt.Println(token)
+	token, err := util.GenerateJWTToken(user, time.Minute*15, resetSecret)
+	resetLink := fmt.Sprintf("http://localhost:3000/reset-password?token=%s", token)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
 		return
 	}
 	if err := util.SendPasswordResetEmail(user, token); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error(), "resetLink": resetLink})
 		return
 	}
-	c.Header("Authorization", token)
 	c.JSON(http.StatusOK, gin.H{"message": "Password reset mail sent successfully", "resetLink": resetLink})
 }
 
